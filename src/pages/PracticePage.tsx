@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,8 +7,19 @@ import Footer from "@/components/layout/Footer";
 import PoseDetection from "@/components/yoga/PoseDetection";
 import PoseCard from "@/components/yoga/PoseCard";
 
+// Define a type for the yoga poses
+interface YogaPose {
+  id: number;
+  name: string;
+  sanskritName: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  benefits: string[];
+  imageUrl: string;
+  description: string;
+}
+
 // Sample poses data - will be expanded later
-const yogaPoses = [
+const yogaPoses: YogaPose[] = [
   {
     id: 1,
     name: "Mountain Pose",
@@ -64,12 +74,12 @@ const yogaPoses = [
     imageUrl: "https://images.unsplash.com/photo-1510894347713-fc3ed6fdf539?q=80&w=1770&auto=format&fit=crop",
     description: "A gentle backbend that opens the chest and strengthens the spine while stretching the shoulders and abdomen."
   }
-] as const;
+];
 
 const PracticePage = () => {
-  const [selectedPose, setSelectedPose] = useState<typeof yogaPoses[0] | null>(null);
+  const [selectedPose, setSelectedPose] = useState<YogaPose | null>(null);
   
-  const handlePoseSelect = (pose: typeof yogaPoses[0]) => {
+  const handlePoseSelect = (pose: YogaPose) => {
     setSelectedPose(pose);
   };
   
@@ -143,7 +153,7 @@ const PracticePage = () => {
                     key={pose.id}
                     name={pose.name}
                     sanskritName={pose.sanskritName}
-                    difficulty={pose.difficulty as "beginner" | "intermediate" | "advanced"}
+                    difficulty={pose.difficulty}
                     benefits={pose.benefits}
                     imageUrl={pose.imageUrl}
                     onPractice={() => handlePoseSelect(pose)}
