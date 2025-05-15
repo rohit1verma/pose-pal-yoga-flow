@@ -84,6 +84,7 @@ const PracticePage = () => {
   const [selectedPose, setSelectedPose] = useState<YogaPose | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState("practice");
+  const [isPracticing, setIsPracticing] = useState(false);
   
   // Check authentication on component mount
   useEffect(() => {
@@ -104,6 +105,7 @@ const PracticePage = () => {
   const handlePoseSelect = (pose: YogaPose) => {
     setSelectedPose(pose);
     setActiveTab("practice");
+    setIsPracticing(false);
     
     toast({
       title: `${pose.name} selected`,
@@ -113,6 +115,8 @@ const PracticePage = () => {
   
   const handleStartGuidedPractice = () => {
     if (selectedPose) {
+      setIsPracticing(true);
+      
       toast({
         title: `Starting ${selectedPose.name} practice`,
         description: "Position yourself in front of the camera to begin",
@@ -143,7 +147,20 @@ const PracticePage = () => {
             <TabsContent value="practice" className="space-y-8">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 pose-detection-area">
-                  <PoseDetection />
+                  {isPracticing && selectedPose && (
+                    <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <h3 className="text-lg font-semibold mb-2">{selectedPose.name} Instructions</h3>
+                      <p className="mb-2">{selectedPose.description}</p>
+                      <ul className="list-disc list-inside text-sm space-y-1">
+                        {selectedPose.benefits.map((benefit, idx) => (
+                          <li key={idx}>{benefit}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <PoseDetection 
+                    activePoseName={isPracticing && selectedPose ? selectedPose.name : undefined}
+                  />
                 </div>
                 
                 <div>
@@ -170,7 +187,7 @@ const PracticePage = () => {
                           className="mt-4 w-full bg-yoga-blue hover:bg-yoga-blue/90"
                           onClick={handleStartGuidedPractice}
                         >
-                          Start Guided Practice
+                          {isPracticing ? "Practicing..." : "Start Guided Practice"}
                         </Button>
                       </div>
                     ) : (

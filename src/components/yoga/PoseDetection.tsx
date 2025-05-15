@@ -1,17 +1,34 @@
-
 import { useRef, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Settings } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
-const PoseDetection = () => {
+interface PoseDetectionProps {
+  activePoseName?: string;
+}
+
+const PoseDetection = ({ activePoseName }: PoseDetectionProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isWebcamActive, setIsWebcamActive] = useState(false);
   const [isPoseDetectionActive, setIsPoseDetectionActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [poseScore, setPoseScore] = useState<number | null>(null);
+  
+  // Initialize pose detection when an active pose is set
+  useEffect(() => {
+    if (activePoseName && !isPoseDetectionActive && isWebcamActive) {
+      setIsPoseDetectionActive(true);
+      
+      // Simulate pose detection with random scoring
+      const interval = setInterval(() => {
+        setPoseScore(Math.floor(Math.random() * 100));
+      }, 2000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [activePoseName, isWebcamActive, isPoseDetectionActive]);
   
   // Initialize webcam
   const initializeWebcam = async () => {
@@ -34,6 +51,11 @@ const PoseDetection = () => {
           title: "Camera activated",
           description: "Your webcam has been successfully initialized."
         });
+        
+        // If there's an active pose, automatically start detection
+        if (activePoseName) {
+          setIsPoseDetectionActive(true);
+        }
       }
     } catch (error) {
       console.error("Error initializing webcam:", error);
@@ -73,7 +95,9 @@ const PoseDetection = () => {
       // Start pose detection
       toast({
         title: "Pose detection started",
-        description: "We're now analyzing your yoga poses."
+        description: activePoseName 
+          ? `We're now analyzing your ${activePoseName} pose.`
+          : "We're now analyzing your yoga poses."
       });
       
       // Simulate pose detection with random scoring (will be replaced with TensorFlow.js)
@@ -149,6 +173,13 @@ const PoseDetection = () => {
   
   return (
     <Card className="overflow-hidden">
+      {/* Display active pose banner when applicable */}
+      {activePoseName && (
+        <div className="bg-yoga-blue text-white p-3 font-semibold text-center">
+          Currently Practicing: {activePoseName}
+        </div>
+      )}
+      
       <div className="webcam-container" style={{ height: '480px' }}>
         <video 
           ref={videoRef}
