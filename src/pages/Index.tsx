@@ -1,12 +1,35 @@
-
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Heart, Calendar, Play } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "@/components/ui/use-toast";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check authentication status on component mount
+  useEffect(() => {
+    // Simulate auth check - replace with actual authentication when integrated with Supabase
+    const userAuth = localStorage.getItem("yogaAI-user");
+    setIsAuthenticated(!!userAuth);
+  }, []);
+
+  const handlePracticeClick = () => {
+    if (isAuthenticated) {
+      navigate("/practice");
+    } else {
+      toast({
+        title: "Authentication required",
+        description: "Please create an account or sign in to start practicing",
+      });
+      navigate("/signup");
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -32,12 +55,14 @@ const Index = () => {
                 Get real-time feedback, track your progress, and improve your form with our advanced pose detection technology.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/practice">
-                  <Button size="lg" className="bg-yoga-blue hover:bg-yoga-blue/90 text-white">
-                    Start Practicing
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                <Button 
+                  size="lg" 
+                  className="bg-yoga-blue hover:bg-yoga-blue/90 text-white"
+                  onClick={handlePracticeClick}
+                >
+                  Start Practicing
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
                 <Link to="/signup">
                   <Button size="lg" variant="outline">
                     Create Account

@@ -34,15 +34,25 @@ const SignupForm = () => {
       // Simulate signup - will be replaced with Supabase auth
       console.log("Signup attempt with:", { name, email, password });
       
+      // Store auth state in localStorage (temporary solution until Supabase integration)
+      const userData = {
+        email,
+        name,
+        isAuthenticated: true,
+        createdAt: new Date().toISOString()
+      };
+      
+      localStorage.setItem("yogaAI-user", JSON.stringify(userData));
+      
       // Simulate a successful signup
       setTimeout(() => {
         toast({
           title: "Account created",
-          description: "Welcome to YogaAI! You can now log in."
+          description: "Welcome to YogaAI! You can now start practicing."
         });
-        navigate('/login');
+        navigate('/practice');
         setIsLoading(false);
-      }, 1500);
+      }, 800);
       
     } catch (error) {
       console.error("Signup error:", error);

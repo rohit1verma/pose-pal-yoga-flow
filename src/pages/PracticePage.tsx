@@ -1,7 +1,10 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "@/components/ui/use-toast";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import PoseDetection from "@/components/yoga/PoseDetection";
@@ -77,10 +80,50 @@ const yogaPoses: YogaPose[] = [
 ];
 
 const PracticePage = () => {
+  const navigate = useNavigate();
   const [selectedPose, setSelectedPose] = useState<YogaPose | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [activeTab, setActiveTab] = useState("practice");
   
+  // Check authentication on component mount
+  useEffect(() => {
+    // Simulate auth check - replace with actual authentication when integrated with Supabase
+    const userAuth = localStorage.getItem("yogaAI-user");
+    
+    if (!userAuth) {
+      toast({
+        title: "Authentication required",
+        description: "Please create an account or sign in to access this page",
+      });
+      navigate("/signup");
+    } else {
+      setIsAuthenticated(true);
+    }
+  }, [navigate]);
+
   const handlePoseSelect = (pose: YogaPose) => {
     setSelectedPose(pose);
+    setActiveTab("practice");
+    
+    toast({
+      title: `${pose.name} selected`,
+      description: "Follow the instructions to practice this pose",
+    });
+  };
+  
+  const handleStartGuidedPractice = () => {
+    if (selectedPose) {
+      toast({
+        title: `Starting ${selectedPose.name} practice`,
+        description: "Position yourself in front of the camera to begin",
+      });
+      
+      // Scroll to the pose detection area
+      document.querySelector('.pose-detection-area')?.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   };
   
   return (
@@ -91,7 +134,7 @@ const PracticePage = () => {
         <div className="max-w-7xl mx-auto">
           <h1 className="text-3xl font-bold mb-6">Practice Yoga</h1>
           
-          <Tabs defaultValue="practice" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList>
               <TabsTrigger value="practice">Interactive Practice</TabsTrigger>
               <TabsTrigger value="poses">Yoga Poses</TabsTrigger>
@@ -99,7 +142,7 @@ const PracticePage = () => {
             
             <TabsContent value="practice" className="space-y-8">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 pose-detection-area">
                   <PoseDetection />
                 </div>
                 
@@ -125,6 +168,7 @@ const PracticePage = () => {
                         </div>
                         <Button 
                           className="mt-4 w-full bg-yoga-blue hover:bg-yoga-blue/90"
+                          onClick={handleStartGuidedPractice}
                         >
                           Start Guided Practice
                         </Button>
