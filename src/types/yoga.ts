@@ -7,4 +7,10 @@ export interface YogaPose {
   benefits: string[];
   imageUrl: string;
   description: string;
+  category?: "standing" | "seated" | "balancing" | "backbend" | "forward bend" | "resting";
 }
+
+export type PoseDetectionResult = {
+  score: number;
+  feedback?: string[];
+};

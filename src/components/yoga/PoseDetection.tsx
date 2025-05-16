@@ -6,6 +6,7 @@ import { useWebcam } from "@/hooks/useWebcam";
 import WebcamView from "@/components/yoga/detection/WebcamView";
 import PoseControls from "@/components/yoga/detection/PoseControls";
 import ActivePoseBanner from "@/components/yoga/detection/ActivePoseBanner";
+import { yogaPoses } from "@/data/yogaPoses";
 
 interface PoseDetectionProps {
   activePoseName?: string;
@@ -23,6 +24,11 @@ const PoseDetection = ({ activePoseName }: PoseDetectionProps) => {
     togglePoseDetection,
     stopWebcam
   } = useWebcam(activePoseName);
+  
+  // Find active pose details
+  const activePose = activePoseName 
+    ? yogaPoses.find(pose => pose.name === activePoseName) 
+    : undefined;
   
   // Toggle pose detection
   const handleTogglePoseDetection = () => {
@@ -54,7 +60,13 @@ const PoseDetection = ({ activePoseName }: PoseDetectionProps) => {
   return (
     <Card className="overflow-hidden">
       {/* Display active pose banner when applicable */}
-      {activePoseName && <ActivePoseBanner activePoseName={activePoseName} />}
+      {activePoseName && activePose && (
+        <ActivePoseBanner 
+          activePoseName={activePoseName} 
+          difficulty={activePose.difficulty}
+          sanskritName={activePose.sanskritName}
+        />
+      )}
       
       <WebcamView
         activePoseName={activePoseName}
